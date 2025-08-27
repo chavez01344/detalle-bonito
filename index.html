@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Elija el mejor día del año</title>
+  <style>
+    :root{
+      --bg: #f8f6fb;
+      --card: #ffffffcc;
+      --accent: #c7a4ff;
+      --accent-2: #ffd6e7;
+      --text: #2b2b2f;
+      --muted: #7a7a87;
+      --ring: rgba(199,164,255,.55);
+      --shadow: 0 10px 30px rgba(116, 82, 191, .15);
+      --radius: 18px;
+      --fucsia: #ff4da6;
+      --rosa-pastel: #ffe6f0;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+
+    body{
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+      background: radial-gradient(1200px 600px at 10% 10%, #fdfcff 0%, var(--bg) 45%),
+                  radial-gradient(900px 500px at 100% 0%, #fff7fb 0%, var(--bg) 60%);
+      color: var(--text);
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    .wrap{ width: min(980px, 92vw); display: grid; gap: 22px; text-align: center; }
+    h1{ margin: 0; font-weight: 800; letter-spacing: -0.02em; font-size: clamp(22px, 4.5vw, 44px);
+        background: linear-gradient(90deg, #5f35ff, #ff6dbf, #8b5cf6);
+        -webkit-background-clip: text; background-clip: text; color: transparent;
+        filter: drop-shadow(0 1px 0 rgba(255,255,255,.6)); }
+    .subtitle{ color: var(--muted); font-size: clamp(14px, 2.2vw, 16px); margin-top: -6px; }
+
+    .card{ backdrop-filter: saturate(140%) blur(8px); -webkit-backdrop-filter: saturate(140%) blur(8px);
+      background: var(--card); border: 1px solid rgba(139,92,246,.15); border-radius: var(--radius);
+      box-shadow: var(--shadow); padding: 18px; }
+
+    .calendar{ display: grid; gap: 12px; }
+    .month-bar{ display: flex; align-items: center; justify-content: center; gap: 10px;
+      padding: 6px 8px 2px; color: var(--muted); font-weight: 600; letter-spacing: .02em; }
+    .grid{ display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+    .dow{ font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+
+    .day{ aspect-ratio: 1 / 1; display: grid; place-items: center; border-radius: 14px; position: relative;
+      overflow: hidden; border: 1px dashed rgba(139,92,246,.22);
+      background: linear-gradient(180deg, #ffffffcc, #ffffffa8);
+      transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
+    .day button{ all: unset; cursor: pointer; width: 100%; height: 100%; display: grid; place-items: center;
+      font-weight: 700; font-size: clamp(14px, 2.5vw, 18px); color: var(--text); position: relative; z-index: 2; }
+    .day:hover{ transform: translateY(-2px); box-shadow: 0 8px 20px rgba(91, 44, 196, .12); border-color: var(--ring); }
+    .day::before{ content: ""; position: absolute; inset: 0;
+      background: radial-gradient(220px 220px at 50% 0%, var(--accent-2), transparent 60%);
+      opacity: 0; transition: opacity .2s ease; }
+    .day:hover::before{ opacity: .6; }
+
+    #question, #result{ display:none; text-align:center; }
+
+    #question {
+      background-color: var(--rosa-pastel);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,.1);
+    }
+
+    .question-box {
+      background: #fff;
+      padding: 20px;
+      border-radius: 15px;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .question-text{ font-size:1.4rem; margin:20px; }
+    .options { display: grid; gap: 12px; }
+    .options button{
+      padding: 14px;
+      border:none;
+      border-radius: 12px;
+      background: var(--fucsia);
+      color:white;
+      cursor:pointer;
+      font-size:1rem;
+      transition: transform .2s;
+    }
+    .options button:hover{ background:#e60073; transform: scale(1.05); }
+
+    .parchment{ background:#fdf6e3; border:2px solid #d4af37; padding:30px; border-radius:15px;
+      font-family:'Georgia',serif; font-size:1.3rem; color:#5b4636; box-shadow:inset 0 0 20px rgba(0,0,0,.2);
+      max-width:600px; margin:40px auto; line-height:1.6; }
+
+    .message{ font-size:1.4rem; color:#c53030; margin-top:30px; }
+    .countdown{ font-size:2rem; color:red; font-weight:bold; margin-top:20px; }
+  </style>
+</head>
+<body>
+  <main class="wrap" aria-labelledby="title" id="calendarScreen">
+    <header>
+      <h1 id="title">Elija el mejor día del año</h1>
+      <p class="subtitle">Abril 2024 — haga clic en un día para seleccionarlo</p>
+    </header>
+
+    <section class="card calendar" aria-label="Calendario Abril 2024">
+      <div class="month-bar" aria-hidden="true">Abril 2024</div>
+      <div class="grid" role="row" aria-hidden="true">
+        <div class="dow">Lu</div><div class="dow">Ma</div><div class="dow">Mi</div>
+        <div class="dow">Ju</div><div class="dow">Vi</div><div class="dow">Sá</div><div class="dow">Do</div>
+      </div>
+      <div class="grid" id="days" role="grid" aria-labelledby="title"></div>
+      <div class="note">Consejo: puedes usar las flechas del teclado para moverte y Enter para seleccionar.</div>
+    </section>
+  </main>
+
+  <section id="question">
+    <div class="question-box">
+      <p class="question-text">Dime el primer plato que te cociné en tu casa</p>
+      <div class="options">
+        <button onclick="wrongAnswer()">Pollo al sillao</button>
+        <button onclick="correctAnswer()">Arroz con pollo</button>
+        <button onclick="wrongAnswer()">Causa</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="result"></section>
+
+  <audio id="bg-music" src="musica.mp3"></audio>
+
+  <script>
+    (function(){
+      const year = 2024;
+      const monthIndex = 3;
+      const firstDay = new Date(year, monthIndex, 1);
+      const lastDay = new Date(year, monthIndex + 1, 0);
+      const startWeekday = (firstDay.getDay() + 6) % 7;
+      const totalDays = lastDay.getDate();
+
+      const grid = document.getElementById('days');
+      const calendarScreen = document.getElementById('calendarScreen');
+      const question = document.getElementById('question');
+      const result = document.getElementById('result');
+      const music = document.getElementById('bg-music');
+
+      for(let i=0; i<startWeekday; i++){
+        const spacer = document.createElement('div');
+        spacer.className = 'day';
+        spacer.style.visibility = 'hidden';
+        grid.appendChild(spacer);
+      }
+
+      for(let d=1; d<=totalDays; d++){
+        const wrapper = document.createElement('div');
+        wrapper.className = 'day';
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = d;
+        btn.addEventListener('click', () => selectDay(d));
+        wrapper.appendChild(btn);
+        grid.appendChild(wrapper);
+      }
+
+      function selectDay(day){
+        calendarScreen.style.display = 'none';
+        if(day === 19){
+          question.style.display = 'block'; // solo muestra la pregunta
+        } else {
+          result.style.display = 'block';
+          result.innerHTML = `<div class="message">🚨 ¡ALERTA! 🚨 Has elegido un día prohibido.<br><br>😱 Sospechoso detectado... ¡IMPOSTORAAA! Ve a bailar a TikTok mientras tanto 😂</div>`;
+        }
+      }
+
+      window.correctAnswer = function(){
+        question.style.display = 'none';
+        result.style.display = 'block';
+
+        // Forzar carga y reproducir música
+        music.load();
+        music.play().then(() => {
+          console.log("🎶 Música reproduciéndose");
+        }).catch(err => {
+          alert("⚠️ Tu navegador bloqueó la reproducción automática. Haz clic en cualquier parte para activar la música ❤️");
+        });
+
+        result.innerHTML = `<div class="parchment">Mi amor, desde aquel primer plato hasta hoy, cada momento contigo ha sido un regalo que guardo en el corazón. No importa el tiempo ni el lugar, siempre serás mi mejor decisión, mi inspiración y mi razón de sonreír. A pesar de tener problemas, mi corazon no encuentra una mejor razon para existir que no seas tu, siempre tu y siempre nuestras metas, nuestro futuro juntos y las promesas que tenemos por cumplir ❤️ Siempre tu osito del Lorax, el marce<3.</div>`;
+      }
+
+      window.wrongAnswer = function(){
+        question.style.display = 'none';
+        result.style.display = 'block';
+        let countdown = 10;
+        result.innerHTML = `<div class="message">🙅‍♀️ ¡RESPUESTA INCORRECTA!<br><br>IMPOSTORAAA DETECTADA 🚀 Activando autodestrucción en <span id='count'>${countdown}</span>...</div>`;
+        const counter = document.getElementById('count');
+        const interval = setInterval(()=>{
+          countdown--;
+          counter.textContent = countdown;
+          if(countdown <= 0){
+            clearInterval(interval);
+            result.innerHTML = `<div class='message'>💥 KABOOM 💥 Adiós impostora, este dispositivo explotó de tanto drama 😂</div>`;
+          }
+        },1000);
+      }
+    })();
+  </script>
+</body>
+</html>
