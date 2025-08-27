@@ -124,7 +124,7 @@
       <p class="question-text">Dime el primer plato que te cociné en tu casa</p>
       <div class="options">
         <button onclick="wrongAnswer()">Pollo al sillao</button>
-        <button onclick="correctAnswer()">Arroz con pollo</button>
+        <button onclick="correctAnswer(); document.getElementById('bg-music').play();">Arroz con pollo</button>
         <button onclick="wrongAnswer()">Causa</button>
       </div>
     </div>
@@ -147,7 +147,6 @@
       const calendarScreen = document.getElementById('calendarScreen');
       const question = document.getElementById('question');
       const result = document.getElementById('result');
-      const music = document.getElementById('bg-music');
 
       for(let i=0; i<startWeekday; i++){
         const spacer = document.createElement('div');
@@ -180,14 +179,6 @@
       window.correctAnswer = function(){
         question.style.display = 'none';
         result.style.display = 'block';
-
-        // Forzar carga y reproducir música
-        music.load();
-        music.play().then(() => {
-          console.log("🎶 Música reproduciéndose");
-        }).catch(err => {
-          alert("⚠️ Tu navegador bloqueó la reproducción automática. Haz clic en cualquier parte para activar la música ❤️");
-        });
 
         result.innerHTML = `<div class="parchment">Mi amor, desde aquel primer plato hasta hoy, cada momento contigo ha sido un regalo que guardo en el corazón. No importa el tiempo ni el lugar, siempre serás mi mejor decisión, mi inspiración y mi razón de sonreír. A pesar de tener problemas, mi corazon no encuentra una mejor razon para existir que no seas tu, siempre tu y siempre nuestras metas, nuestro futuro juntos y las promesas que tenemos por cumplir ❤️ Siempre tu osito del Lorax, el marce<3.</div>`;
       }
